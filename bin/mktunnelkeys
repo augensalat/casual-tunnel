@@ -1,0 +1,83 @@
+#!/bin/bash
+
+set -e
+
+program=`basename $0`
+opt_t=rsa
+opt_q=
+
+die() {
+  echo "$program: Error: $@" >&2
+  exit 1
+}
+
+usage() {
+  min=$1; max=$2; opts=$3; msg=$4; shift 4
+
+  while getopts q$opts flag; do
+    case $flag in
+      q)
+        opt_q='-q'
+        ;;
+      \? | :)
+        exit 1
+        ;;
+      ?)
+        eval "opt_${flag}=${OPTARG:-true}"
+        ;;
+    esac
+  done
+
+  shift=$(( $OPTIND - 1 ))
+  shift $shift
+
+  if [ $# -lt $min -o $# -gt $max ]; then
+    echo "usage: $program [-q] $msg" >&2
+    exit 1
+  fi
+}
+
+usage 3 3 t: "[-t (dsa|rsa)] key-name remote-address remote-port" "$@"
+shift $(( $OPTIND - 1 ))
+key="$1"
+addr="$2"
+port="$3"
+
+if [ ! -e .ssh ]; then
+  install -d -m 0700 .ssh
+fi
+
+if [ $(id -u) -eq 0 ]; then
+  ssh_dir=~tunnel/.ssh
+  sudo -u tunnel ssh-keygen -t dsa -f ~tunnel/.ssh/lall -N ''
+  tmpkey=$(sudo -u tunnel mktemp $ssh_dir/XXXXXXXXX)
+  prompt="$(hostname):~ #"
+else
+  ssh_dir=.ssh
+  ssh-keygen $opt_q -t $opt_t -f .ssh/$key -N ''
+  tmpkey=$(mktemp $ssh_dir/XXXXXXXXX)
+  me=${LOGNAME:-$(id -nu)}
+  prompt="$me@$(hostname):~>"
+fi
+(echo -n "command=\"/usr/bin/netcat $addr $port\",no-port-forwarding "; cat $ssh_dir/$key.pub) >$tmpkey
+mv $tmpkey $ssh_dir/$key.pub
+if [ -z $opt_q ]; then
+  echo
+  echo Generated keys.
+  echo
+  echo 'Now copy the public key' $ssh_dir/$key.pub to $addr
+  echo 'and append it there to ~tunnel/.ssh/authorized_keys :'
+  echo
+  echo "    $prompt scp" $ssh_dir/$key.pub $addr:/tmp/$key.pub
+  echo "    $prompt ssh $addr"
+  if [ $(id -u) -ne 0 ]; then
+    echo "    $me@$addr:~> su -"
+  fi
+  echo "    $addr:~ # cat" /tmp/$key.pub '>>~tunnel/.ssh/authorized_keys'
+  echo "    $addr:~ # rm" /tmp/$key.pub
+  echo "    $addr:~ # exit"
+  if [ $(id -u) -ne 0 ]; then
+    echo "    $me@$addr:~> exit"
+  fi
+  echo
+fi

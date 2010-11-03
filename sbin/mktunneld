@@ -1,0 +1,85 @@
+#!/bin/bash
+
+set -e
+
+program=`basename $0`
+opt_i=127.0.0.1
+opt_q=
+opt_u=tunnel
+opt_c=4
+
+die() {
+  echo "$program: Error: $@" >&2
+  exit 1
+}
+
+msg() {
+  if [ -z $opt_q ]; then echo "$@"; fi
+}
+
+usage() {
+  min=$1; max=$2; opts=$3; msg=$4; shift 4
+
+  while getopts q$opts flag; do
+    case $flag in
+      q)
+        opt_q='-q'
+        ;;
+      \? | :)
+        exit 1
+        ;;
+      ?)
+        eval "opt_${flag}=${OPTARG:-true}"
+        ;;
+    esac
+  done
+
+  shift=$(( $OPTIND - 1 ))
+  shift $shift
+
+  if [ $# -lt $min -o $# -gt $max ]; then
+    echo "usage: $program [-q] $msg" >&2
+    exit 1
+  fi
+}
+
+usage 3 3 i:u:c: "[-u remote-user] [-i ip] [-c concurrency] port remote-host key-name" "$@"
+shift $(( $OPTIND - 1 ))
+port="$1"
+host="$2"
+key="$3"
+svc_dir="/etc/tunnel/host/$host/$key"
+log_dir="/var/log/tunnel/$host/$key"
+
+install -d -m 1755 "$svc_dir"
+install -d -m 0755 "$svc_dir/log"
+install -d -m 0755 -o nobody -g nobody "$log_dir"
+
+cat <<EOF >"$svc_dir/run"
+#!/bin/sh
+
+exec 2>&1
+exec envuidgid tunnel \\
+    tcpserver -DRUv -c $opt_c -l 0 $opt_i $port \\
+        ssh -T $opt_u@$host -i /etc/tunnel/.ssh/$key
+EOF
+
+msg "Created service run file \"$svc_dir/run\""
+
+cat <<EOF >"$svc_dir/log/run"
+#!/bin/sh
+exec setuidgid nobody multilog t "$log_dir"
+EOF
+
+msg "Created service log run file \"$svc_dir/run\""
+
+chmod 0755 "$svc_dir/run"
+chmod 0755 "$svc_dir/log/run"
+
+msg
+msg "Please check the results."
+msg
+msg "To start the service run the following command as root:"
+msg
+msg "    svc-add $svc_dir tunnel_$host_$key"
+msg

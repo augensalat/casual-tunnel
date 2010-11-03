@@ -1,0 +1,6 @@
+casual-tunnel 0.01  2010-10-31
+
+Copyright Bernhard Graf <graf@movingtarget.de>
+
+casual-tunnel provides two simple scripts for setting up
+on-demand ssh-tunnels.

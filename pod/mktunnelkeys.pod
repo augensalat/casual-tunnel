@@ -1,0 +1,36 @@
+=head1 NAME
+
+mktunnelkeys - SSH key generation for on demand tunnels
+
+=head1 SYNOPSIS
+
+mktunnelkeys [ -q ] [ -t (rsa|dsa) ] key-name remote-address remote-port
+
+=head1 DESCRIPTION
+
+B<mktunnelkeys> generates SSH authentication keys needed for an on-demand
+tunnel, which are set up using L<mktunneld (1)>. When run as root, the
+keys are stored in F<~tunnel/.ssh> under the given C<key-name>, otherwise
+keys are stored in the current user's F<.ssh> directory.
+
+Unless the C<-q> option was given, the user is told how to install the
+public on the remote system.
+
+=head1 OPTIONS
+
+=over
+
+=item -q
+
+Be quiet.
+
+=item -t (rsa|dsa)
+
+Specifies the type of key to create. The possible values are C<rsa> or C<dsa>.
+
+=back
+
+=head1 SEE ALSO
+
+L<mktunneld (8)>
+

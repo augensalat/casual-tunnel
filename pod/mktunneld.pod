@@ -1,0 +1,72 @@
+=head1 NAME
+
+mktunneld - Set up an ssh tunnel daemon
+
+=head1 SYNOPSIS
+
+mktunneld [ -q ] [ -u remote-user ] [ -i ip ] [ -c concurrency ] \
+          port remote-host key-name
+
+=head1 DESCRIPTION
+
+B<mktunneld> creates a C<daemontools> service to initiate an on-demand
+ssh-tunnel from I<port> (and by default IP C<127.0.0.1>) to the
+I<remote-host> using key I<key-name>.
+
+B<mktunneld> must be run as root.
+
+The key must be generated beforehand using the command L<mktunnelkeys(1)>.
+
+=head1 OPTIONS
+
+=over
+
+=item -q
+
+Be quiet.
+
+=item -u remote-user
+
+Username on the remote host, where the ssh pubkey is found in
+F<.ssh/authorized_keys>.
+
+Default: C<tunnel>
+
+=item -i ip
+
+IP address where the tunnel starts.
+
+Default: C<127.0.0.1>
+
+=item -c concurrency
+
+Maximum number of concurrent TCP connections.
+
+Default: C<4>
+
+=back
+
+=head1 EXAMPLES
+
+C<host.example.net> is located behind a firewall, that blocks incoming
+http requests. Here is how to access the intranet website, that can be
+accessed on the intranet under C<http://intranet.local>, from outside.
+
+As root run the following commands:
+
+  mktunnelkeys -t dsa intranet intranet.local 80
+  # at the end mktunnelkeys will instruct you how to
+  # copy the public key to tunnel@host.example.net
+  mktunneld -c 10 -i 127.0.0.10 80 host.example.net intranet
+  svc-add /etc/tunnel/host/host.example.net/intranet \
+          tunnel_host.example.net_intranet
+  echo "127.0.0.10 intranet.local" >>/etc/hosts
+
+Now you are able to access C<http://intranet.local> even when you are
+outside the intranet. The connection goes through an ssh tunnel, which
+is created on the fly.
+
+=head1 SEE ALSO
+
+L<mktunnelkeys (1)>
+
