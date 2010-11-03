@@ -43,10 +43,6 @@ key="$1"
 addr="$2"
 port="$3"
 
-if [ ! -e .ssh ]; then
-  install -d -m 0700 .ssh
-fi
-
 if [ $(id -u) -eq 0 ]; then
   ssh_dir=~tunnel/.ssh
   sudo -u tunnel ssh-keygen -t dsa -f ~tunnel/.ssh/lall -N ''
@@ -54,27 +50,31 @@ if [ $(id -u) -eq 0 ]; then
   prompt="$(hostname):~ #"
 else
   ssh_dir=.ssh
-  ssh-keygen $opt_q -t $opt_t -f .ssh/$key -N ''
+  if [ ! -e $ssh_dir ]; then
+    install -d -m 0700 $ssh_dir
+  fi
+  ssh-keygen $opt_q -t $opt_t -f $ssh_dir/"$key" -N ''
   tmpkey=$(mktemp $ssh_dir/XXXXXXXXX)
   me=${LOGNAME:-$(id -nu)}
   prompt="$me@$(hostname):~>"
 fi
-(echo -n "command=\"/usr/bin/netcat $addr $port\",no-port-forwarding "; cat $ssh_dir/$key.pub) >$tmpkey
-mv $tmpkey $ssh_dir/$key.pub
+
+(echo -n "command=\"/usr/bin/netcat $addr $port\",no-port-forwarding "; cat $ssh_dir/"$key.pub") >$tmpkey
+mv $tmpkey $ssh_dir/"$key.pub"
 if [ -z $opt_q ]; then
   echo
   echo Generated keys.
   echo
-  echo 'Now copy the public key' $ssh_dir/$key.pub to $addr
+  echo 'Now copy the public key' \"$ssh_dir/$key.pub\" to $addr
   echo 'and append it there to ~tunnel/.ssh/authorized_keys :'
   echo
-  echo "    $prompt scp" $ssh_dir/$key.pub $addr:/tmp/$key.pub
+  echo "    $prompt scp" \"$ssh_dir/$key.pub\" $addr:\"/tmp/$key.pub\"
   echo "    $prompt ssh $addr"
   if [ $(id -u) -ne 0 ]; then
     echo "    $me@$addr:~> su -"
   fi
-  echo "    $addr:~ # cat" /tmp/$key.pub '>>~tunnel/.ssh/authorized_keys'
-  echo "    $addr:~ # rm" /tmp/$key.pub
+  echo "    $addr:~ # cat" \"/tmp/$key.pub\" '>>~tunnel/.ssh/authorized_keys'
+  echo "    $addr:~ # rm" \"/tmp/$key.pub\"
   echo "    $addr:~ # exit"
   if [ $(id -u) -ne 0 ]; then
     echo "    $me@$addr:~> exit"
