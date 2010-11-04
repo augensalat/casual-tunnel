@@ -13,6 +13,11 @@ tunnel, which are set up using L<mktunneld (1)>. When run as root, the
 keys are stored in F<~tunnel/.ssh> under the given C<key-name>, otherwise
 keys are stored in the current user's F<.ssh> directory.
 
+When the tunnel is built L<netcat (1)> is started on the remote, connecting
+to C<remote-address> on C<remote-port>. That means that also C<localhost> is
+also a valid value for C<remote-address>, which might sound a bit confusing
+at first.
+
 Unless the C<-q> option was given, the user is told how to install the
 public on the remote system.
 
@@ -29,6 +34,15 @@ Be quiet.
 Specifies the type of key to create. The possible values are C<rsa> or C<dsa>.
 
 =back
+
+=head1 EXAMPLES
+
+To access the the L<smbd (8)>, that runs on a remote system on C<127.0.0.2>,
+issue
+
+  mktunnelkeys -t dsa samba_tunnel 127.0.0.2 139
+
+and follow the instructions.
 
 =head1 SEE ALSO
 
