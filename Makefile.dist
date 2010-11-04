@@ -19,6 +19,3 @@ install: bin/mktunnelkeys sbin/mktunneld
 	$(install) -m 0755 sbin/mktunneld $(DESTDIR)$(sbindir)/mktunneld
 	$(install) -m 644 man/mktunnelkeys.1 $(DESTDIR)$(man1dir)
 	$(install) -m 644 man/mktunneld.8 $(DESTDIR)$(man8dir)
-
-clean:
-	rm -rf man/*
