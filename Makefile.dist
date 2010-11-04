@@ -1,0 +1,24 @@
+DESTDIR = ""
+install = /usr/bin/install
+rm = /bin/rm
+tar = /bin/tar
+
+prefix = /usr/local
+bindir = $(prefix)/bin
+sbindir = $(prefix)/sbin
+mandir = $(prefix)/man
+man1dir = $(mandir)/man1
+man8dir = $(mandir)/man8
+
+all:
+
+install: bin/mktunnelkeys sbin/mktunneld
+	$(install) -d -m 0755 $(DESTDIR)$(bindir) $(DESTDIR)$(sbindir)
+	$(install) -d -m 0755 $(DESTDIR)$(man1dir) $(DESTDIR)$(man8dir)
+	$(install) -m 0755 bin/mktunnelkeys $(DESTDIR)$(bindir)/mktunnelkeys
+	$(install) -m 0755 sbin/mktunneld $(DESTDIR)$(sbindir)/mktunneld
+	$(install) -m 644 man/mktunnelkeys.1 $(DESTDIR)$(man1dir)
+	$(install) -m 644 man/mktunneld.8 $(DESTDIR)$(man8dir)
+
+clean:
+	rm -rf man/*
