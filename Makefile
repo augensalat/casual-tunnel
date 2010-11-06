@@ -21,6 +21,7 @@ dist: bin/mktunnelkeys sbin/mktunneld man
 	$(install) -m 644 man/* $(DIST)/man
 	$(install) -m 644 README $(DIST)/README
 	$(install) -m 644 Makefile.dist $(DIST)/Makefile
+	$(install) -m 644 casual-tunnel.spec.dist $(DIST)/$(DIST).spec
 	$(tar) cvvf $(DIST).tar.bz2 --use=bzip2 $(DIST)
 	$(rm) -rf $(DIST)
 
@@ -35,10 +36,12 @@ install: bin/mktunnelkeys sbin/mktunneld man
 man: man/mktunnelkeys.1 man/mktunneld.8
 
 man/mktunnelkeys.1:
+	mkdir -p man
 	pod2man -c '' -r '' -s 1 pod/mktunnelkeys.pod man/mktunnelkeys.1
 
 man/mktunneld.8:
+	mkdir -p man
 	pod2man -c '' -r '' -s 8 pod/mktunneld.pod man/mktunneld.8
 
 clean:
-	rm -rf man/*
+	rm -rf man
