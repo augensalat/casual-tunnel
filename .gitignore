@@ -1,3 +1,6 @@
+man
+*.tar.gz
+*.tar.bz2
 *~
 .*
 !.gitignore
