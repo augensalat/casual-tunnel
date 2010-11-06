@@ -20,6 +20,8 @@ dist: bin/mktunnelkeys sbin/mktunneld man
 	$(install) -m 0755 sbin/mktunneld $(DIST)/sbin/mktunneld
 	$(install) -m 644 man/* $(DIST)/man
 	$(install) -m 644 README $(DIST)/README
+	sed -e 's/##DIST##/$(DIST)/g' INSTALL.dist >$(DIST)/INSTALL
+	chmod 0644 $(DIST)/INSTALL
 	$(install) -m 644 Makefile.dist $(DIST)/Makefile
 	$(install) -m 644 casual-tunnel.spec.dist $(DIST)/$(DIST).spec
 	$(tar) cvvf $(DIST).tar.bz2 --use=bzip2 $(DIST)

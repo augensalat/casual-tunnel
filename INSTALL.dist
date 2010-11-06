@@ -1,0 +1,13 @@
+Installing in an RPM based distribution:
+
+  rpmbuild -ta ##DIST##.tar.bz2
+  sudo rpm -Uvh <PATH_TO_RPM>/##DIST##.noarch.rpm
+
+Otherwise (assuming a current GNU tar at least):
+
+  tar xjf ##DIST##.tar.bz2
+  cd ##DIST##
+  make install [prefix=/usr] [mandir=/usr/share/man]
+
+Check the Makefile to learn more about path defaults and ways of
+customizing.

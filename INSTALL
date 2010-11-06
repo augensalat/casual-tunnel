@@ -1,0 +1,14 @@
+Clone casual-tunnel repository from GitHub:
+
+  git clone git://github.com/augensalat/casual-tunnel.git
+
+Change into casual-tunnel directory:
+
+  cd casual-tunnel
+
+Generate distribution archive file:
+
+  make dist
+
+This creates a bzip2 compressed tar archive in the current directoy.
+Note, that "pod2man (1)" is required for generating the man pages.
