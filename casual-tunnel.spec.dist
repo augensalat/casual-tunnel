@@ -1,0 +1,55 @@
+#
+# spec file for package casual-tunnel (Version 0.01)
+#
+# Copyright  (c)  2010  Bernhard Graf <graf@movingtarget.de>
+# This file and all modifications and additions to the pristine
+# package are under the same license as the package itself.
+#
+
+Name:		casual-tunnel
+Version:	0.01
+Release:	0
+Summary:	On-the-fly ssh tunnels
+Group:		Productivity/Networking/System
+License:	None
+Source:		casual-tunnel-%{version}.tar.bz2
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRequires:	make
+Requires(pre):	pwdutils
+Requires:	openssh
+BuildArch:	noarch
+
+%description
+casual-tunnel provides two simple scripts for setting up
+on-demand ssh-tunnels.
+
+%prep
+%setup -q
+
+%build
+
+%install
+test "%{buildroot}" != "/" -a -d "%{buildroot}" && %{__rm} -rf "%{buildroot}"
+
+%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/tunnel
+%{__make} install DESTDIR=%{buildroot} prefix=%{_prefix} mandir=%{_mandir}
+
+%clean
+test "%{buildroot}" != "/" -a -d "%{buildroot}" && %{__rm} -rf "%{buildroot}"
+
+%pre
+# Add "tunnel" user
+/usr/sbin/useradd -r -g nogroup -d /etc/tunnel -s /bin/sh -c "ssh tunnel" tunnel &>/dev/null || :
+
+%files
+%defattr(-,root,root,-)
+%doc README
+%dir %attr(0755,tunnel,nogroup) %{_sysconfdir}/tunnel
+%{_prefix}/bin/*
+%{_prefix}/sbin/*
+%{_mandir}/man1/*
+%{_mandir}/man8/*
+
+%changelog
+* Sat Nov 06 2010 - Bernhard Graf <graf@movingtarget.de>
+- Initial release
