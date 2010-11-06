@@ -4,8 +4,8 @@ mktunneld - Set up an ssh tunnel daemon
 
 =head1 SYNOPSIS
 
-mktunneld [ -q ] [ -u remote-user ] [ -i ip ] [ -c concurrency ] \
-          port remote-host key-name
+  mktunneld [ -q ] [ -u remote-user ] [ -i ip ] [ -c concurrency ] \
+            port remote-host key-name
 
 =head1 DESCRIPTION
 
@@ -15,7 +15,7 @@ I<remote-host> using key I<key-name>.
 
 B<mktunneld> must be run as root.
 
-The key must be generated beforehand using the command L<mktunnelkeys(1)>.
+The key must be generated beforehand using the command L<mktunnelkeys (1)>.
 
 =head1 OPTIONS
 
@@ -50,7 +50,7 @@ Default: C<4>
 
 C<host.example.net> is located behind a firewall, that blocks incoming
 http requests. Here is how to access the intranet website, that can be
-accessed on the intranet under C<http://intranet.local>, from outside.
+reached within the intranet under C<http://intranet.local>.
 
 As root run the following commands:
 
