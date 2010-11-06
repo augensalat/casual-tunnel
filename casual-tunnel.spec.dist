@@ -16,7 +16,7 @@ Source:		casual-tunnel-%{version}.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires:	make
 Requires(pre):	pwdutils
-Requires:	openssh
+Requires:	openssh daemontools
 BuildArch:	noarch
 
 %description
