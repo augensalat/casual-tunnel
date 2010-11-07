@@ -5,6 +5,7 @@ set -e
 program=`basename $0`
 opt_t=rsa
 opt_q=
+opt_n=$(which netcat 2>/dev/null) || opt_n=$(which nc 2>/dev/null) || netcat=/usr/bin/netcat
 
 die() {
   echo "$program: Error: $@" >&2
@@ -37,7 +38,7 @@ usage() {
   fi
 }
 
-usage 3 3 t: "[-t (dsa|rsa)] key-name remote-address remote-port" "$@"
+usage 3 3 n:t: "[-n <REMOTE-NETCAT>] [-t (dsa|rsa)] key-name remote-address remote-port" "$@"
 shift $(( $OPTIND - 1 ))
 key="$1"
 addr="$2"
@@ -59,7 +60,7 @@ else
   prompt="$me@$(hostname):~>"
 fi
 
-(echo -n "command=\"/usr/bin/netcat $addr $port\",no-port-forwarding "; cat $ssh_dir/"$key.pub") >$tmpkey
+(echo -n "command=\"$opt_n $addr $port\",no-port-forwarding "; cat $ssh_dir/"$key.pub") >$tmpkey
 mv $tmpkey $ssh_dir/"$key.pub"
 if [ -z $opt_q ]; then
   echo
